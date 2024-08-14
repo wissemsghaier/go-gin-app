@@ -1,0 +1,48 @@
+stages:
+  - checkout
+  - setup
+  - list
+  - install
+  - build
+  - test
+
+variables:
+  GO_VERSION: '1.22.5'
+
+checkout:
+  stage: checkout
+  script:
+    - git rev-parse --short HEAD > commit_hash.txt
+    - export COMMIT_ID=$(cat commit_hash.txt)
+    - export ZIP_FILE_NAME="${ARTIFACT_ID}-${COMMIT_ID}.zip"
+    - echo "Commit Hash: ${COMMIT_ID}"
+    - echo "Zip File Name: ${ZIP_FILE_NAME}"
+
+setup:
+  stage: setup
+  script:
+    - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
+    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+    - export PATH=/usr/local/go/bin:$PATH
+    - go version
+
+list:
+  stage: list
+  script:
+    - ls -al
+
+install:
+  stage: install
+  script:
+    - go mod download
+
+build:
+  stage: build
+  script:
+    - go build -o main .
+
+test:
+  stage: test
+  script:
+    - go test -v ./...
+
