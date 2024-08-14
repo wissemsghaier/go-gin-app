@@ -8,7 +8,9 @@ stages:
 
 variables:
   GO_VERSION: '1.22.5'
+  ARTIFACT_ID: 'artifact'  # Ensure this variable is defined if used
 
+# Checkout stage
 checkout:
   stage: checkout
   script:
@@ -18,6 +20,7 @@ checkout:
     - echo "Commit Hash: ${COMMIT_ID}"
     - echo "Zip File Name: ${ZIP_FILE_NAME}"
 
+# Setup Go environment
 setup:
   stage: setup
   script:
@@ -26,23 +29,26 @@ setup:
     - export PATH=/usr/local/go/bin:$PATH
     - go version
 
+# List files in the workspace
 list:
   stage: list
   script:
     - ls -al
 
+# Install Go dependencies
 install:
   stage: install
   script:
     - go mod download
 
+# Build the Go project
 build:
   stage: build
   script:
     - go build -o main .
 
+# Run unit tests
 test:
   stage: test
   script:
     - go test -v ./...
-
