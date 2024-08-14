@@ -47,7 +47,6 @@ build:
   script:
     - go build -o main .
 
-# Run unit tests
 test:
   stage: test
   script:
