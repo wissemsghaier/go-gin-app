@@ -12,7 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and install JMeter
-RUN wget -q https://downloads.apache.org/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz -O /tmp/jmeter.tgz && \
+RUN wget -q https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz -O /tmp/jmeter.tgz && \
     mkdir -p ${JMETER_HOME} && \
     tar -xzf /tmp/jmeter.tgz -C ${JMETER_HOME} --strip-components=1 && \
     rm /tmp/jmeter.tgz
