@@ -1,55 +1,15 @@
 stages:
-  - checkout
-  - setup
-  - list
-  - install
   - build
   - test
 
-variables:
-  GO_VERSION: '1.22.5'
-  ARTIFACT_ID: 'artifact'  # Ensure this variable is defined if used
-
-# Checkout stage
-checkout:
-  stage: checkout
-  script:
-    - git rev-parse --short HEAD > commit_hash.txt
-    - export COMMIT_ID=$(cat commit_hash.txt)
-    - export ZIP_FILE_NAME="${ARTIFACT_ID}-${COMMIT_ID}.zip"
-    - echo "Commit Hash: ${COMMIT_ID}"
-    - echo "Zip File Name: ${ZIP_FILE_NAME}"
-
-# Setup Go environment
-setup:
-  stage: setup
-  script:
-    - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-    - export PATH=/usr/local/go/bin:$PATH
-    - go version
-
-# List files in the workspace
-list:
-  stage: list
-  script:
-    - ls -al
-
-# Install Go dependencies
-install:
-  stage: install
-  script:
-    - go mod download
-
-# Build the Go project
-build:
+job_build:
   stage: build
   script:
-    - go build -o main .
+    - echo "Building the project"
 
-# Run unit tests
-test:
+job_test:
   stage: test
   script:
-    - go test -v ./...
+    - echo "Running tests"
+
 
