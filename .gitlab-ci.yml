@@ -2,10 +2,10 @@ variables:
   GO_VERSION: "1.22.5"  # Specify the Go version you are using
 
 stages:
-  - setup
+  - set
 
 setup_go_environment:
-  stage: setup
+  stage: set
   script:
     - echo "Setting up Go environment"
     - curl -LO "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
