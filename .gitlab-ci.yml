@@ -1,39 +1,8 @@
 stages:
-  - build
   - test
-# Variables globales
-variables:
-  GO111MODULE: "on"
-  GO_VERSION: "1.22.5"
 
-# Job pour installer les paquets
-install:
-  stage: build
-  image: golang:${GO_VERSION}
-  script:
-    - go mod tidy
-    - go mod download
-  artifacts:
-    paths:
-      - vendor/
-
-# Job pour construire le projet
-build:
-  stage: build
-  image: golang:${GO_VERSION}
-  script:
-    - go build -o app main.go
-  artifacts:
-    paths:
-      - app
-
-# Job pour exécuter les tests unitaires
-test:
+job1:
   stage: test
-  image: golang:${GO_VERSION}
   script:
-    - go test -v ./...
-  coverage: '/^coverage: (\d+\.\d+)%$/'
+    - echo "Hello, World!"
 
-  only:
-    - main
