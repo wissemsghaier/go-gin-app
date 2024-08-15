@@ -1,3 +1,13 @@
+image: golang:1.22.5
+
+variables:
+  NEXUS_CREDENTIALS_ID: 'nexus-jenkins'
+  NEXUS_URL: 'https://nexus.u-cloudsolutions.xyz'
+  NEXUS_REPOSITORY: 'student-repository'
+  GROUP_ID: 'com.artificial.GO'
+  ARTIFACT_ID: 'artifact'
+  GO_VERSION: '1.22.5'
+
 stages:
   - checkout
   - setup
@@ -5,10 +15,6 @@ stages:
   - install
   - build
   - test
-
-variables:
-  GO_VERSION: '1.22.5'
-  ARTIFACT_ID: 'artifact'
 
 # Checkout stage
 checkout:
@@ -22,6 +28,8 @@ checkout:
     - echo "Zip File Name: ${ZIP_FILE_NAME}"
   tags:
     - shell
+  after_script:
+    - slack_notify "Checkout stage" $CI_JOB_STATUS
 
 # Setup Go environment
 setup:
@@ -29,11 +37,13 @@ setup:
   script:
     - echo "Setting up Go environment..."
     - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+    - tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
     - export PATH=/usr/local/go/bin:$PATH
     - go version
   tags:
     - shell
+  after_script:
+    - slack_notify "Setup stage" $CI_JOB_STATUS
 
 # List files in the workspace
 list:
@@ -43,29 +53,57 @@ list:
     - ls -al
   tags:
     - shell
+  after_script:
+    - slack_notify "List stage" $CI_JOB_STATUS
+
+# Install Go dependencies
 install:
   stage: install
   script:
-    - echo "Installing Go dependencies..."
+    - echo "Downloading Go modules..."
+    - export PATH=/usr/local/go/bin:$PATH
     - go mod download
   tags:
     - shell
+  after_script:
+    - slack_notify "Install stage" $CI_JOB_STATUS
 
 # Build the Go project
 build:
   stage: build
   script:
     - echo "Building the Go project..."
+    - export PATH=/usr/local/go/bin:$PATH
     - go build -o main .
   tags:
     - shell
+  artifacts:
+    paths:
+      - main
+  after_script:
+    - slack_notify "Build stage" $CI_JOB_STATUS
 
 # Run unit tests
 test:
   stage: test
   script:
     - echo "Running unit tests..."
+    - export PATH=/usr/local/go/bin:$PATH
     - go test -v ./...
   tags:
     - shell
+  after_script:
+    - slack_notify "Test stage" $CI_JOB_STATUS
+
+# Slack notification function
+slack_notify() {
+  local stage_name=$1
+  local status=$2
+  local color
+  if [ "$status" == "success" ]; then
+    color="good"
+  else
+    color="danger"
+  fi
+  curl -X POST -H 'Content-type: application/json' --data '{"channel":"#jenkins-notifications", "text":"Stage '${stage_name}' has ${status} (${CI_JOB_URL})", "attachments":[{"color":"'$color'"}]}' https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 
