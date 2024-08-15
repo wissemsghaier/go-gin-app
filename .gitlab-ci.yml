@@ -1,4 +1,6 @@
 stages:
+  - checkout
+  - setup
   - list
   - install
   - build
@@ -6,6 +8,10 @@ stages:
 
 variables:
   GO_VERSION: '1.22.5'
+  NEXUS_URL: 'https://nexus.u-cloudsolutions.xyz'
+  NEXUS_REPOSITORY: 'student-repository'
+  GROUP_ID: 'com.artificial.GO'
+  ARTIFACT_ID: 'artifact'
 
 cache:
   paths:
@@ -14,27 +20,58 @@ cache:
 before_script:
   - export PATH=/usr/local/go/bin:$PATH
 
+checkout:
+  stage: checkout
+  script:
+    - git rev-parse --short HEAD > commit_hash.txt
+    - export COMMIT_ID=$(cat commit_hash.txt)
+    - export ZIP_FILE_NAME="${ARTIFACT_ID}-${COMMIT_ID}.zip"
+    - echo "Commit Hash: $COMMIT_ID"
+    - echo "Zip File Name: $ZIP_FILE_NAME"
+  tags:
+    - shell
+
+setup:
+  stage: setup
+  script:
+    - echo "Setting up Go environment"
+    - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
+    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+    - go version
+  tags:
+    - shell
+
 list_files:
   stage: list
   script:
     - echo "Listing files in the workspace"
     - ls -al
+  tags:
+    - shell
 
 install_dependencies:
   stage: install
   script:
     - echo "Downloading Go modules"
     - go mod download
+  tags:
+    - shell
 
 build_project:
   stage: build
   script:
     - echo "Building the Go project"
     - go build -o main .
+  tags:
+    - shell
 
 run_tests:
   stage: test
   script:
     - echo "Running unit tests"
     - go test -v ./...
+  tags:
+    - shell
+
+# Optional: Additional configurations such as notifications
 
