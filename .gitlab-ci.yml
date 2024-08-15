@@ -1,9 +1,10 @@
 stages:
   - install
   - build
-  - test
+  - test_unit
 
 variables:
+  # Définir les variables d'environnement si nécessaire
   GO_VERSION: "1.22.5"
 
 before_script:
@@ -29,7 +30,7 @@ build_project:
       - myapp
 
 run_tests:
-  stage: test
+  stage: test_unit
   image: golang:$GO_VERSION
   script:
     - go test ./...
