@@ -1,13 +1,7 @@
 stages:
-  - announce
   - build
   - test
   - deploy
-
-announce_stage:
-  stage: announce
-  script:
-    - echo "Début du pipeline CI/CD"
 
 build_job:
   stage: build
