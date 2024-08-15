@@ -1,5 +1,4 @@
 stages:
-  - checkout
   - setup
   - list_files
   - install_dependencies
@@ -22,16 +21,6 @@ variables:
 
 before_script:
   - export PATH=/usr/local/go/bin:$PATH
-
-checkout:
-  stage: checkout
-  script:
-    - git clone https://gitlab.u-cloudsolutions.xyz/summary-internship/2024/wissem-sghaier/my-gin-project.git .
-    - git rev-parse --short HEAD > commit_hash.txt
-    - export COMMIT_ID=$(cat commit_hash.txt | tr -d '\n')
-    - export ZIP_FILE_NAME="${ARTIFACT_ID}-${COMMIT_ID}.zip"
-    - echo "Commit Hash: ${COMMIT_ID}"
-    - echo "Zip File Name: ${ZIP_FILE_NAME}"
 
 setup:
   stage: setup
