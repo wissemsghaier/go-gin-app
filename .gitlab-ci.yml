@@ -1,19 +1,14 @@
+variables:
+  GO_VERSION: "1.22.5"  # Specify the Go version you are using
+
 stages:
-  - build
-  - test
-  - deploy
+  - setup
 
-build_job:
-  stage: build
+setup_go_environment:
+  stage: setup
   script:
-    - echo "Étape de construction du projet"
-
-test_job:
-  stage: test
-  script:
-    - echo "Étape de tests du projet"
-
-deploy_job:
-  stage: deploy
-  script:
-    - echo "Étape de déploiement du projet"
+    - echo "Setting up Go environment"
+    - curl -LO "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
+    - sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
+    - export PATH=/usr/local/go/bin:$PATH
+    - go version
