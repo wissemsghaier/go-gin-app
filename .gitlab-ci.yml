@@ -43,8 +43,6 @@ list:
     - ls -al
   tags:
     - shell
-
-# Install Go dependencies
 install:
   stage: install
   script:
