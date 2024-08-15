@@ -7,8 +7,4 @@ stages:
 setup_go_environment:
   stage: set
   script:
-    - echo "Setting up Go environment"
-    - curl -LO "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
-    - sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
-    - export PATH=/usr/local/go/bin:$PATH
-    - go version
+    - echo "Setting up Go environment
