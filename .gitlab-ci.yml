@@ -1,40 +1,9 @@
 stages:
   - list
-  - install
-  - build
-  - test
-
-variables:
-  GO_VERSION: '1.22.5'
-
-cache:
-  paths:
-    - go/pkg/mod
-
-before_script:
-  - export PATH=/usr/local/go/bin:$PATH
 
 list_files:
   stage: list
   script:
     - echo "Listing files in the workspace"
     - ls -al
-
-install_dependencies:
-  stage: install
-  script:
-    - echo "Downloading Go modules"
-    - go mod download
-
-build_project:
-  stage: build
-  script:
-    - echo "Building the Go project"
-    - go build -o main .
-
-run_tests:
-  stage: test
-  script:
-    - echo "Running unit tests"
-    - go test -v ./...
 
