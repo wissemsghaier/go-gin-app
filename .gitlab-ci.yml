@@ -64,7 +64,6 @@ build_project:
     - go build -o main .
   tags:
     - shell
-
 run_tests:
   stage: test
   script:
