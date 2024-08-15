@@ -1,92 +1,41 @@
 stages:
-  - setup
-  - list_files
-  - install_dependencies
+  - install
   - build
   - test
-  - code_quality
-  - quality_gate
-  - package
-  - upload
 
 variables:
-  GO_VERSION: '1.22.5'  # Specify the Go version you are using
-  NEXUS_CREDENTIALS_ID: 'nexus-jenkins'
-  NEXUS_URL: 'https://nexus.u-cloudsolutions.xyz'
-  NEXUS_REPOSITORY: 'student-repository'
-  GROUP_ID: 'com.artificial.GO'
-  ARTIFACT_ID: 'artifact'
-  SONARQUBE_URL: 'https://sonarqube.u-cloudsolutions.xyz'
-  SONARQUBE_TOKEN: 'squ_b730e6c811798750f5442b5ec90950a58600c316'
+  # Définir les variables d'environnement si nécessaire
+  GO_VERSION: "1.22.5"
 
 before_script:
-  - export PATH=/usr/local/go/bin:$PATH
+  - echo "Début du pipeline"
 
-setup:
-  stage: setup
+install_packages:
+  stage: install
+  image: golang:$GO_VERSION
   script:
-    - echo "Setting up Go environment"
-    - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-    - go version
-
-list_files:
-  stage: list_files
-  script:
-    - echo "Listing files in the workspace"
-    - ls -al
-
-install_dependencies:
-  stage: install_dependencies
-  script:
-    - echo "Downloading Go modules"
     - go mod download
+  artifacts:
+    paths:
+      - go.sum
+      - go.mod
 
-build:
+build_project:
   stage: build
+  image: golang:$GO_VERSION
   script:
-    - echo "Building the Go project"
-    - go build -o main .
+    - go build -o myapp
+  artifacts:
+    paths:
+      - myapp
 
-test:
+run_tests:
   stage: test
+  image: golang:$GO_VERSION
   script:
-    - echo "Running unit tests"
-    - go test -v ./...
+    - go test ./...
+  coverage: '/^coverage: \d+\.\d+%$/'
 
-code_quality:
-  stage: code_quality
-  script:
-    - echo "Running SonarQube scanner"
-    - sonar-scanner \
-      -Dsonar.projectKey=Go-project \
-      -Dsonar.projectName=Go-project \
-      -Dsonar.sources=. \
-      -Dsonar.host.url=${SONARQUBE_URL} \
-      -Dsonar.login=${SONARQUBE_TOKEN} \
-      -Dsonar.exclusions=vendor/**
+after_script:
+  - echo "Pipeline terminé"
 
-quality_gate:
-  stage: quality_gate
-  script:
-    - echo "Waiting for SonarQube Quality Gate"
-    - sleep 60
-    - sonar-quality-gate-check --server ${SONARQUBE_URL} --token ${SONARQUBE_TOKEN}
-
-package:
-  stage: package
-  script:
-    - echo "Packaging project as ${ZIP_FILE_NAME}..."
-    - sudo apt-get update
-    - sudo apt-get install -y zip
-    - zip -r ${ZIP_FILE_NAME} .
-
-upload:
-  stage: upload
-  script:
-    - echo "Uploading ${ZIP_FILE_NAME} to Nexus..."
-    - curl -u ${NEXUS_CREDENTIALS_ID}:${NEXUS_PASSWORD} \
-      --upload-file ${ZIP_FILE_NAME} \
-      "${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${GROUP_ID//./\/}/${ARTIFACT_ID}/${COMMIT_ID}/${ZIP_FILE_NAME}"
-  only:
-    - main
