@@ -1,9 +1,7 @@
 variables:
   GO_VERSION: "1.22.5"  # Specify the Go version you are using
-
 stages:
   - set
-
 setup_go_environment:
   stage: set
   script:
