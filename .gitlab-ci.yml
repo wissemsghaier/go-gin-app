@@ -1,74 +1,25 @@
 stages:
-  - checkout
-  - setup
-  - list
-  - install
+  - announce
   - build
   - test
+  - deploy
 
-variables:
-  GO_VERSION: '1.22.5'
-  ARTIFACT_ID: 'artifact'
-
-# Checkout stage
-checkout:
-  stage: checkout
+announce_stage:
+  stage: announce
   script:
-    - echo "Fetching commit hash..."
-    - git rev-parse --short HEAD > commit_hash.txt
-    - export COMMIT_ID=$(cat commit_hash.txt)
-    - export ZIP_FILE_NAME="${ARTIFACT_ID}-${COMMIT_ID}.zip"
-    - echo "Commit Hash: ${COMMIT_ID}"
-    - echo "Zip File Name: ${ZIP_FILE_NAME}"
-  tags:
-    - shell
+    - echo "Début du pipeline CI/CD"
 
-# Setup Go environment
-setup:
-  stage: setup
-  script:
-    - echo "Setting up Go environment..."
-    - curl -LO https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-    - sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-    - export PATH=/usr/local/go/bin:$PATH
-    - go version
-  tags:
-    - shell
-
-# List files in the workspace
-list:
-  stage: list
-  script:
-    - echo "Listing files in the workspace..."
-    - ls -al
-  tags:
-    - shell
-
-# Install Go dependencies
-install:
-  stage: install
-  script:
-    - echo "Installing Go dependencies..."
-    - go mod download
-  tags:
-    - shell
-
-# Build the Go project
-build:
+build_job:
   stage: build
   script:
-    - echo "Building the Go project..."
-    - go build -o main .
-  tags:
-    - shell
+    - echo "Étape de construction du projet"
 
-# Run unit tests
-test:
+test_job:
   stage: test
   script:
-    - echo "Running unit tests..."
-    - go test -v ./...
-  tags:
-    - shell
+    - echo "Étape de tests du projet"
 
-
+deploy_job:
+  stage: deploy
+  script:
+    - echo "Étape de déploiement du projet"
